@@ -36,7 +36,7 @@ Route::middleware(['auth'])->group(function () {
 
         $timestampLast = Respondent::latest('updated_at')->first();
         $timestampUpdate = UploadRecord::latest('next_upload_time')->first();
-        $time_stamp = $timestampLast ? $timestampLast->updated_at->format('Y-m-d') : null;
+        $time_stamp = $timestampLast?->updated_at->format('Y-m-d');
         $time_stamp_next = $timestampUpdate ? $timestampUpdate->next_upload_time : null;
         return view('app', ['time_stamp' =>$time_stamp,'time_stamp_next' =>$time_stamp_next]);
     })->where('vue_capture', '[\/\w\.-]*');
