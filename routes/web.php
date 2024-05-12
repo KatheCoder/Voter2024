@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RespondentController;
+use App\Models\Models\UploadRecord;
+use App\Models\Respondent;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,11 +29,16 @@ Route::middleware(['auth'])->group(function () {
         return view('admin');
     })->name('admin');
 
-    Route::post('/import', [\App\Http\Controllers\RespondentController::class, 'import']);
+    Route::post('/import', [RespondentController::class, 'import']);
 
     // Catch-all route for Vue SPA
     Route::get('/{vue_capture?}', function () {
-        return view('app');
+
+        $timestampLast = Respondent::latest('updated_at')->first();
+        $timestampUpdate = UploadRecord::latest('next_upload_time')->first();
+        $time_stamp = $timestampLast ? $timestampLast->updated_at->format('Y-m-d') : null;
+        $time_stamp_next = $timestampUpdate ? $timestampUpdate->next_upload_time : null;
+        return view('app', ['time_stamp' =>$time_stamp,'time_stamp_next' =>$time_stamp_next]);
     })->where('vue_capture', '[\/\w\.-]*');
 
 });

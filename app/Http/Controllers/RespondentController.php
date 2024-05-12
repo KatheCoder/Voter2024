@@ -10,14 +10,16 @@ use Throwable;
 
 class RespondentController extends Controller
 {
-    public function import(Request $request)
+    public function import(Request $request, UploadRecordController $uploadRecordController)
     {
         try {
-            if ($request->hasFile('file')) {
+            if ($request->hasFile('file') && $request->next_update ) {
                 $file = $request->file('file');
                 $import = new RespondentsImport();
                 Excel::import($import, $file);
                 $importedRowsCount = $import->getRowCount();
+                $uploadRecordController->handleUploadRecord(auth()->id(), $importedRowsCount,$request->next_update );
+
                 return redirect()->route('admin')->with('success', $importedRowsCount . ' respondent(s) imported successfully.');
             } else {
                 return redirect()->route('admin')->with('error', 'No file uploaded.');
