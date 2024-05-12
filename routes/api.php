@@ -23,3 +23,4 @@ use Illuminate\Support\Facades\Route;
 Route::get('/filters', [FilterController::class, 'fetchFilters']);
 Route::get('/filtered-data', [DataController::class, 'getPieFilteredData']);
 Route::get('/data', [DataController::class, 'getFilteredData']);
+Route::get('/count', [DataController::class, 'getOverallCount']);

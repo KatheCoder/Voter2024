@@ -59,6 +59,12 @@ class DataController extends Controller
             return response()->json(['error' => 'Something went wrong.', $e->getMessage()], 500);
         }
     }
+    public function getOverallCount(){
+        return response()->json([
+            'overall' =>  Respondent::count(),
+        ]);
+
+}
 
 
     public function getFilteredData(Request $request): JsonResponse

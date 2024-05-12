@@ -5,6 +5,15 @@
             <a class="navbar-brand" href="#">
                 <img src="/images/img_2.png"  alt="ANC Logo" height="60">
             </a>
+
+                <ul class="navbar-nav d-flex justify-content-end col">
+                    <li class="nav-item">
+                        <a class="nav-link ">
+                          <span class="fw-bold">n = {{this.overallRespondents.overall}}</span>
+                        </a>
+                    </li>
+                </ul>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -36,18 +45,24 @@
 
 <script>
 import axios from 'axios';
-// import imgUrl from '/public/images/Icon.png'
-// const imgUrl = new URL('./public/images/Icon.png', import.meta.url).href
 
 export default {
     name: "NavigationMenu",
-    props: {
-        totalRespondents: {
-            type: String,
-            default: ''
+    data() {
+        return {
+            overallRespondents:''
         }
     },
     methods: {
+        fetchData() {
+            axios.get('/api/count')
+                .then(response => {
+                    this.overallRespondents = response.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
         logout() {
             axios.post('/logout')
                 .then(response => {
@@ -57,6 +72,9 @@ export default {
                     console.error('Logout failed:', error);
                 });
         }
+    },
+    mounted() {
+        this.fetchData();
     }
 }
 </script>
