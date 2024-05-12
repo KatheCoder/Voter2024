@@ -9,7 +9,6 @@
                         <th>Abbr.</th>
                         <th>Party Name</th>
                         <th>% GT sum of weight</th>
-                        <th>Total Weight</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -22,9 +21,6 @@
                         </td>
                         <td class="legend-text">
                             <p>{{ value.data }}%</p>
-                        </td>
-                        <td class="legend-text">
-                            <p>{{ value.sum.total_weight }}</p>
                         </td>
                     </tr>
                     </tbody>
