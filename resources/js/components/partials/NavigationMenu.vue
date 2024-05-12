@@ -1,6 +1,6 @@
 <template>
 <div>
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-expand-lg shadow fixed-top" style="background-color: goldenrod">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Dashboard</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -9,19 +9,25 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <router-link  class="nav-link" to="/dashboard/A">View 1</router-link>
+                        <router-link class="nav-link " to="/dashboard/A">
+                            <i class="fas fa-chart-line me-1"></i> View 1
+                        </router-link>
+                    </li>
+                    <li class="nav-item ">
+                        <router-link class="nav-link " to="/dashboard/B">
+                            <i class="fas fa-tasks me-1"></i> View 2
+                        </router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link  class="nav-link" to="/dashboard/B">View 2</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link class="nav-link" @click="logout" to="/logout">Logout</router-link>
+                        <router-link class="nav-link" @click="logout" to="/logout">
+                            <i class="fas fa-sign-out-alt me-1"></i> Logout
+                        </router-link>
                     </li>
                 </ul>
+
             </div>
         </div>
     </nav>
-
 
 </div>
 </template>
@@ -31,6 +37,17 @@ import axios from 'axios';
 
 export default {
     name: "NavigationMenu",
+    props: {
+        totalRespondents: {
+            type: String,
+            default: ''
+        }
+    },
+    data() {
+        return {
+            lastUpdated: '',
+        }
+    },
     methods: {
         logout() {
             axios.post('/logout')
