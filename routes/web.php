@@ -33,11 +33,13 @@ Route::middleware(['auth'])->group(function () {
 
     // Catch-all route for Vue SPA
     Route::get('/{vue_capture?}', function () {
-
-        $timestampLast = Respondent::latest('updated_at')->first();
-        $timestampUpdate = UploadRecord::latest('next_upload_time')->first();
-        $time_stamp = $timestampLast?->updated_at->format('Y-m-d');
-        $time_stamp_next = $timestampUpdate ? $timestampUpdate->next_upload_time : null;
+//
+//        $timestampLast = Respondent::latest('updated_at')->first();
+//        $timestampUpdate = UploadRecord::latest('next_upload_time')->first();
+//        $time_stamp = $timestampLast?->updated_at->format('Y-m-d');
+//        $time_stamp_next = $timestampUpdate ? $timestampUpdate->next_upload_time : null;
+        $time_stamp ="Unavailable";
+        $time_stamp_next ="Unavailable";
         return view('app', ['time_stamp' =>$time_stamp,'time_stamp_next' =>$time_stamp_next]);
     })->where('vue_capture', '[\/\w\.-]*');
 
