@@ -16,17 +16,17 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-//        $developer = User::create([
-//            'name' => 'Developer',
-//            'email' => 'katlego.majatladi@gmail.com',
-//            'password' => bcrypt('DeveloperPassword'),
-//        ]);
-//
-//        $adminRole = Role::where('name', 'admin')->first();
-//
-//        if ($adminRole) {
-//            $developer->roles()->attach($adminRole);
-//        }
+        $developer = User::create([
+            'name' => 'Developer',
+            'email' => 'katlego.majatladi@gmail.com',
+            'password' => bcrypt('DeveloperPassword'),
+        ]);
+
+        $adminRole = Role::where('name', 'admin')->first();
+
+        if ($adminRole) {
+            $developer->roles()->attach($adminRole);
+        }
         $user = User::create([
             'name' => 'Ancgp',
             'email' => 'Ancgp@anc.co.za',
