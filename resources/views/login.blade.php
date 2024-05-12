@@ -22,7 +22,7 @@
                 <div class="col-12 col-md-6 col-xl-7">
                     <div class="d-flex justify-content-center">
                         <div class="col-12 col-xl-9 text-center"> <!-- Added text-center class -->
-                            <img class="img-fluid rounded mb-4" loading="lazy" src="{{ asset('images/anc-logo.png') }}" width="245" height="80" alt="ANC Logo">
+                            <img class="img-fluid rounded mb-4" loading="lazy" src="{{ asset('images/ANC-Logo.png') }}" width="245" height="80" alt="ANC Logo">
                             <hr class="border-primary-subtle mb-4">
                             <h2 class="h1 mb-4">Dashboard</h2>
                         </div>

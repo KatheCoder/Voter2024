@@ -2,7 +2,9 @@
 <div>
     <nav class="navbar navbar-expand-lg shadow fixed-top" style="background-color: goldenrod">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Dashboard</a>
+            <a class="navbar-brand" href="#">
+                <img src="/images/img_2.png"  alt="ANC Logo" height="60">
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -34,6 +36,8 @@
 
 <script>
 import axios from 'axios';
+// import imgUrl from '/public/images/Icon.png'
+// const imgUrl = new URL('./public/images/Icon.png', import.meta.url).href
 
 export default {
     name: "NavigationMenu",
