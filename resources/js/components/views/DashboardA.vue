@@ -1,6 +1,6 @@
 <template>
     <navigation-menu></navigation-menu>
-        <section class="py-3 py-md-5 py-xl-8">
+        <section class="py-3 py-md-5 py-xl-8 mt-5">
 
             <div class="container">
                 <button class="btn btn-primary" @click="resetFilters">Reset Filters</button>
@@ -86,6 +86,7 @@ export default {
             decidedFilteredData: [],
             likelyFilteredData: [],
             statusFilteredData: [],
+            overallRespondents:''
 
         }
     },
@@ -104,6 +105,7 @@ export default {
                     this.ages = response.data.age_groups;
                     this.races = response.data.races;
                     this.municipalities = response.data.municipality;
+
                 })
                 .catch(error => {
                     console.error('Error fetching filters:', error);
@@ -122,6 +124,8 @@ export default {
                     this.decidedFilteredData = response.data.data?.decided;
                     this.likelyFilteredData = response.data.data?.likely;
                     this.statusFilteredData = response.data.data?.voting_status;
+                    this.overallRespondents = response.data?.overall;
+
 
                 })
                 .catch(error => {

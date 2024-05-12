@@ -43,11 +43,6 @@ export default {
             default: ''
         }
     },
-    data() {
-        return {
-            lastUpdated: '',
-        }
-    },
     methods: {
         logout() {
             axios.post('/logout')
