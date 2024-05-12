@@ -9,10 +9,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <router-link  class="nav-link" to="/dashboard/A">Page 1</router-link>
+                        <router-link  class="nav-link" to="/dashboard/A">View 1</router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link  class="nav-link" to="/dashboard/B">Page 2</router-link>
+                        <router-link  class="nav-link" to="/dashboard/B">View 2</router-link>
                     </li>
                     <li class="nav-item">
                         <router-link class="nav-link" @click="logout" to="/logout">Logout</router-link>
