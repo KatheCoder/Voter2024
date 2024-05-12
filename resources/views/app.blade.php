@@ -20,4 +20,21 @@
             </div>
 
     </section>
+    <footer class="footer mt-auto py-3" style="background: rgba(0,166,90,0.54)">
+        <div class="container-fluid ">
+            <div class="row">
+                <div class="col-md-3">
+                    <p class="text-white font-weight-bold">© 2024 copyright Plus 94 Research . All rights reserved.</p>
+                </div>
+                <div class="col">
+                    <p class="text-white font-weight-bold">Disclaimer: This dashboard is exclusively for client’s use and authorised client teams. Results reflected may vary throughout as the sample grows towards a final target of 1500. Client is advised not to make any final decisions until a sample of at least 1000 respondents is reached.
+                        Final datasets are subject to weighting to adjust for sample skews in relation to the population of registered voters.
+
+                    </p>
+
+                 </div>
+            </div>
+        </div>
+    </footer>
+
 @endsection
