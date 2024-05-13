@@ -38,8 +38,8 @@ Route::middleware(['auth'])->group(function () {
 //        $timestampUpdate = UploadRecord::latest('next_upload_time')->first();
 //        $time_stamp = $timestampLast?->updated_at->format('Y-m-d');
 //        $time_stamp_next = $timestampUpdate ? $timestampUpdate->next_upload_time : null;
-        $time_stamp ="Unavailable";
-        $time_stamp_next ="Unavailable";
+        $time_stamp ="13 May 2024";
+        $time_stamp_next ="14 May 2024";
         return view('app', ['time_stamp' =>$time_stamp,'time_stamp_next' =>$time_stamp_next]);
     })->where('vue_capture', '[\/\w\.-]*');
 
