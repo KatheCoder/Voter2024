@@ -14,13 +14,13 @@
                     <tbody>
                     <tr v-for="(value, key) in legendData" :key="key" @mouseover="highlight(value.key)">
                         <td class="legend-text">
-                            <p>{{ value.key }}</p>
+                            <p>{{ value.abbr_name }}</p>
                         </td>
                         <td class="legend-text">
-                            <p>{{ value.value }}</p>
+                            <p>{{ value.name }}</p>
                         </td>
                         <td class="legend-text">
-                            <p>{{ value.data }}%</p>
+                            <p>{{ value.value }}%</p>
                         </td>
                     </tr>
                     </tbody>

@@ -1,7 +1,8 @@
 <template>
     <div>
         <chart :options="chartOptions"></chart>
-        <legend-card :title="title" :legend-data="legendData"></legend-card>
+        <legend-card :title="title" :legend-data="data"></legend-card>
+
     </div>
 </template>
 
@@ -9,31 +10,18 @@
 import { Chart } from 'highcharts-vue';
 import Highcharts from 'highcharts';
 import Exporting from 'highcharts/modules/exporting';
-import LegendCard from "../partials/LegendCard";
-
+import LegendCard from "./LegendCard";
 Exporting(Highcharts);
 
 export default {
     name: 'ColumnChart',
     components: {
-        Chart,
-        LegendCard
+        Chart,LegendCard
     },
     props: {
         title: {
             type: String,
             default: 'Title here'
-        },
-        legendData: {
-            type: Array,
-        },
-        labels: {
-            type: Array,
-            required: true,
-        },
-        colors: {
-            type: Array,
-            required: true,
         },
         data: {
             type: Array,
@@ -57,7 +45,7 @@ export default {
                     text: this.title,
                 },
                 xAxis: {
-                    categories: this.labels,
+                    categories: [], // Will be updated dynamically
                 },
                 yAxis: {
                     title: {
@@ -67,7 +55,7 @@ export default {
                 showInLegend: true,
                 legend: {
                     enabled: true,
-                    labelFormat: '{name}: {y}',
+                    labelFormat: '{name}: {y} %',
                 },
                 plotOptions: {
                     column: {
@@ -75,7 +63,8 @@ export default {
                             enabled: true,
                             formatter: function () {
                                 return `${this.y}%`;
-                            }
+                            },
+                            // rotation: -90,
                         },
                         colorByPoint: true // Enable color by point
                     }
@@ -92,25 +81,25 @@ export default {
             console.log(newValue)
             this.highlightDataPoint(newValue); // Highlight data point
         },
-        labels: {
-            handler(newLabels) {
-                this.chartOptions.xAxis.categories = newLabels;
-            },
-            immediate: true,
-        },
         data: {
             handler(newData) {
-                this.chartOptions.series[0].data = this.formatData(newData); // Format the new data with colors
+                // Update chart data when data prop changes
+                this.chartOptions.series[0].data = this.formatData(newData);
+
+                // Update xAxis categories dynamically
+                this.chartOptions.xAxis.categories = newData.map(item => item.abbr_name);
             },
             immediate: true,
         },
     },
     methods: {
         formatData(data) {
-            // Assign colors to each data point
+            // Extracting necessary fields from JSON data and formatting for Highcharts
             return data.map((item, index) => ({
-                y: item,
-                color: this.colors[index % this.colors.length], // Use color from the 'colors' prop
+                name: item.name,
+                y: parseFloat(item.value), // Assuming value is a string representing a number
+                color: item.color,
+                category: item.abbr_name, // Adding a category from formatted data
             }));
         },
     },

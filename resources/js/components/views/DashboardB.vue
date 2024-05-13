@@ -38,27 +38,24 @@
         </div>
 
     </div>
-        <div class="container-fluid" v-if="nationalLegend">
+        <div class="container-fluid" v-if="national">
             <div class="row">
                 <div class="col-md-6" >
                     <column-chart
-                        :legendData="this.nationalLegend"
+                        :legendData="this.national"
                         @highlight="highlightDataPoint"
                         :highlightedValue="highlightedValue"
                         title='National Elections'
-                        :data="nationalFilteredData"
-                        :colors="nationalFilteredColors"
-                        :labels="nationalLabelsFilteredData"
-
+                        :data="national"
                     ></column-chart>
                 </div>
                 <div class="col-md-6" >
                     <column-chart
-                        :legendData="this.provincialLegend"
+                        :legendData="this.provincial"
                         @highlight="highlightDataPoint"
                         :highlightedValue="highlightedValue"
-                        :colors="provincialFilteredColors"
-                        title="Provincial Elections" :data="provincialFilteredData" :labels="provincialLabelsFilteredData"></column-chart>
+                        title="Provincial Elections" :data="provincial"
+                       ></column-chart>
                 </div>
             </div>
         </div>
@@ -85,8 +82,8 @@ export default {
             selectedAge: '',
             selectedRace: '',
             selectedMunicipality: '',
-            nationalLegend: [],
-            provincialLegend: [],
+            national: [],
+            provincial: [],
             genders: [],
             ages: [],
             races: [],
@@ -135,14 +132,8 @@ export default {
             })
                 .then(response => {
 
-                    this.nationalFilteredData = response.data.national.data;
-                    this.nationalFilteredColors = response.data.national.colors;
-                    this.provincialFilteredData = response.data.provincial.data;
-                    this.provincialFilteredColors = response.data.provincial.colors;
-                    this.nationalLabelsFilteredData = response.data.national.labels;
-                    this.provincialLabelsFilteredData = response.data.provincial.labels;
-                    this.nationalLegend = response.data.nationalLegend;
-                    this.provincialLegend = response.data.provincialLegend;
+                    this.national = response.data.national;
+                    this.provincial= response.data.provincial;
 
                 })
                 .catch(error => {
@@ -157,3 +148,9 @@ export default {
 }
 
 </script>
+<style>
+.chart-container {
+    width: 1500px; /* Set the desired width */
+    overflow-x: auto; /* Enable horizontal scrolling */
+}
+</style>

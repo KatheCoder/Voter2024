@@ -9,6 +9,19 @@ use Illuminate\Http\Request;
 
 class DataController extends Controller
 {
+
+const  PARTY_COLORS = [
+'ANC' => '#ffcb03',
+'DA' => '#00bfff',
+'EFF' => '#FF0000',
+'AJ' => '#4cbb17',
+'MK' => '#000000',
+'IFP' => '#4cbb17',
+'ACTION SA' => '#32CD32',
+'ASC' => '#a94c4c',
+];
+
+
     public function getPieFilteredData(Request $request): JsonResponse
     {
 
@@ -59,12 +72,14 @@ class DataController extends Controller
             return response()->json(['error' => 'Something went wrong.', $e->getMessage()], 500);
         }
     }
-    public function getOverallCount(){
+
+    public function getOverallCount()
+    {
         return response()->json([
-            'overall' =>  Respondent::count(),
+            'overall' => Respondent::count(),
         ]);
 
-}
+    }
 
 
     public function getFilteredData(Request $request): JsonResponse
@@ -95,56 +110,43 @@ class DataController extends Controller
             $nationalPercentages = $this->calculatePercentages($nationalData);
             $provincialPercentages = $this->calculatePercentages($provincialData);
 
-$colors = [
-  'ANC'=>'#ffcb03',
-  'DA'=>'#00bfff',
-  'EFF'=>'#FF0000',
-  'AJ'=>'#4cbb17',
-  'MK'=>'#000000',
-  'IFP'=>'#4cbb17',
-  'ACTION SA'=>'#32CD32',
-  'ASC'=>'#a94c4c',
-];
 
-            //  'UW'=>'',
-//  'IFP'=>'',
-//  'AS'=>'',
-        $nationalLegend = $nationalData->map(function ($item, $index) use ($nationalPercentages,$nationalData) {
+
+            $nationalLegend = $nationalData->map(function ($item, $index) use ($nationalPercentages, $nationalData) {
+                $color = self::PARTY_COLORS[$item->abbreviated_national] ?? '#A9A9A9'; // Default to black if color not found
 
                 return [
-                    'key' => $item->abbreviated_national,
-                    'value' => $item->national,
-                    'data' => $nationalPercentages[$index] ,
-                    'sum' => $nationalData[$index],
+                    'abbr_name' => $item->abbreviated_national,
+                    'color' => $color,
+                    'name' => $item->national,
+                    'value' => $nationalPercentages[$index],
+                    'weight' => number_format($nationalData[$index]['total_weight'], 2, '.', ','),
                 ];
             })->toArray();
 
-            $provincialLegend = $provincialData->map(function ($item, $index) use ($provincialPercentages,$provincialData) {
+            $provincialLegend = $provincialData->map(function ($item, $index) use ($provincialPercentages, $provincialData) {
+                $color = self::PARTY_COLORS[$item->abbreviated_provincial] ?? '#A9A9A9'; // Default to black if color not found
 
                 return [
-                    'key' => $item->abbreviated_provincial,
-                    'value' => $item->provincial,
-                    'data' => $provincialPercentages[$index] ,
-                    'sum' => $provincialData[$index],
+                    'abbr_name' => $item->abbreviated_provincial,
+                    'color' => $color,
+                    'name' => $item->provincial,
+                    'value' => $provincialPercentages[$index],
+                    'weight' => number_format($provincialData[$index]['total_weight'], 2, '.', ','),
 
                 ];
             })->toArray();
+            usort($provincialLegend, function ($a, $b) {
+                return $b['value'] <=> $a['value'];
+            });
+            usort($nationalLegend, function ($a, $b) {
+                return $b['value'] <=> $a['value'];
+            });
 
             return response()->json([
                 'total' => $overallTotalRespondents,
-                'nationalLegend' => $nationalLegend,
-                'provincialLegend' => $provincialLegend,
-                'national' => [
-                    'labels' => $nationalData->pluck('abbreviated_national')->toArray(),
-                    'data' => $nationalPercentages->toArray(),
-                    'colors' => $this->mapValuesToColors($nationalData, $colors),
-                ],
-                'provincial' => [
-                    'labels' => $provincialData->pluck('abbreviated_provincial')->toArray(),
-                    'data' => $provincialPercentages->toArray(),
-                    'colors' => $this->mapProvincialValuesToColors($provincialData, $colors),
-
-                ],
+                'national' => $nationalLegend,
+                'provincial' => $provincialLegend,
             ]);
         } catch (QueryException $e) {
             return response()->json(['error' => 'Database error.'], 500);
@@ -152,30 +154,8 @@ $colors = [
             return response()->json(['error' => 'Something went wrong.'], 500);
         }
     }
-    private function mapProvincialValuesToColors($data, $colors)
-    {
-        $colorMap = [];
 
-        foreach ($data as $item) {
-            // Assuming each item has a key that corresponds to a color in the $colors array
-            $key = $item->abbreviated_provincial; // Using null coalescing operator (??) to handle missing keys
-            $colorMap[] = $colors[$key] ?? '#D6E0F0'; // Default to black if color not found
-        }
 
-        return $colorMap;
-    }
-    private function mapValuesToColors($data, $colors)
-    {
-        $colorMap = [];
-
-        foreach ($data as $item) {
-            // Assuming each item has a key that corresponds to a color in the $colors array
-            $key = $item->abbreviated_national; // Using null coalescing operator (??) to handle missing keys
-            $colorMap[] = $colors[$key] ?? '#D6E0F0'; // Default to black if color not found
-        }
-
-        return $colorMap;
-    }
 
 
     private function applyFilters($query, $filters)
