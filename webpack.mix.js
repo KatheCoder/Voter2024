@@ -15,6 +15,9 @@ mix.js('resources/js/app.js', 'public/js')
     .sass('resources/sass/app.scss', 'public/css')
     .vue()
     .sourceMaps();
+if (mix.inProduction()) {
+    mix.version();
+}
 const path = require('path');
 const webpack = require('webpack');
 
