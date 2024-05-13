@@ -54,7 +54,7 @@ export default {
                 },
                 showInLegend: true,
                 legend: {
-                    enabled: true,
+                    enabled: false,
                     labelFormat: '{name}: {y} %',
                 },
                 plotOptions: {
