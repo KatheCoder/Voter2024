@@ -15,6 +15,8 @@ class RespondentController extends Controller
         try {
             if ($request->hasFile('file') && $request->next_update ) {
                 $file = $request->file('file');
+                Respondent::truncate();
+
                 $import = new RespondentsImport();
                 Excel::import($import, $file);
                 $importedRowsCount = $import->getRowCount();
