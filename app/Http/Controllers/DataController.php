@@ -95,22 +95,38 @@ class DataController extends Controller
             $nationalPercentages = $this->calculatePercentages($nationalData);
             $provincialPercentages = $this->calculatePercentages($provincialData);
 
+$colors = [
+  'ANC'=>'#ffcb03',
+  'DA'=>'#00bfff',
+  'EFF'=>'#FF0000',
+  'AJ'=>'#4cbb17',
+  'MK'=>'#000000',
+  'IFP'=>'#4cbb17',
+  'ACTION SA'=>'#32CD32',
+  'ASC'=>'#a94c4c',
+];
 
-            $nationalLegend = $nationalData->map(function ($item, $index) use ($nationalPercentages,$nationalData) {
+            //  'UW'=>'',
+//  'IFP'=>'',
+//  'AS'=>'',
+        $nationalLegend = $nationalData->map(function ($item, $index) use ($nationalPercentages,$nationalData) {
+
                 return [
                     'key' => $item->abbreviated_national,
                     'value' => $item->national,
                     'data' => $nationalPercentages[$index] ,
-                    'sum' => $nationalData[$index]
+                    'sum' => $nationalData[$index],
                 ];
             })->toArray();
 
             $provincialLegend = $provincialData->map(function ($item, $index) use ($provincialPercentages,$provincialData) {
+
                 return [
                     'key' => $item->abbreviated_provincial,
                     'value' => $item->provincial,
                     'data' => $provincialPercentages[$index] ,
-                    'sum' => $provincialData[$index]
+                    'sum' => $provincialData[$index],
+
                 ];
             })->toArray();
 
@@ -121,10 +137,13 @@ class DataController extends Controller
                 'national' => [
                     'labels' => $nationalData->pluck('abbreviated_national')->toArray(),
                     'data' => $nationalPercentages->toArray(),
+                    'colors' => $this->mapValuesToColors($nationalData, $colors),
                 ],
                 'provincial' => [
                     'labels' => $provincialData->pluck('abbreviated_provincial')->toArray(),
                     'data' => $provincialPercentages->toArray(),
+                    'colors' => $this->mapProvincialValuesToColors($provincialData, $colors),
+
                 ],
             ]);
         } catch (QueryException $e) {
@@ -133,6 +152,31 @@ class DataController extends Controller
             return response()->json(['error' => 'Something went wrong.'], 500);
         }
     }
+    private function mapProvincialValuesToColors($data, $colors)
+    {
+        $colorMap = [];
+
+        foreach ($data as $item) {
+            // Assuming each item has a key that corresponds to a color in the $colors array
+            $key = $item->abbreviated_provincial; // Using null coalescing operator (??) to handle missing keys
+            $colorMap[] = $colors[$key] ?? '#D6E0F0'; // Default to black if color not found
+        }
+
+        return $colorMap;
+    }
+    private function mapValuesToColors($data, $colors)
+    {
+        $colorMap = [];
+
+        foreach ($data as $item) {
+            // Assuming each item has a key that corresponds to a color in the $colors array
+            $key = $item->abbreviated_national; // Using null coalescing operator (??) to handle missing keys
+            $colorMap[] = $colors[$key] ?? '#D6E0F0'; // Default to black if color not found
+        }
+
+        return $colorMap;
+    }
+
 
     private function applyFilters($query, $filters)
     {

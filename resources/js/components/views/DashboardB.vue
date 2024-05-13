@@ -45,13 +45,19 @@
                         :legendData="this.nationalLegend"
                         @highlight="highlightDataPoint"
                         :highlightedValue="highlightedValue"
-                        title='National Elections' :data="nationalFilteredData" :labels="nationalLabelsFilteredData"></column-chart>
+                        title='National Elections'
+                        :data="nationalFilteredData"
+                        :colors="nationalFilteredColors"
+                        :labels="nationalLabelsFilteredData"
+
+                    ></column-chart>
                 </div>
                 <div class="col-md-6" >
                     <column-chart
                         :legendData="this.provincialLegend"
                         @highlight="highlightDataPoint"
                         :highlightedValue="highlightedValue"
+                        :colors="provincialFilteredColors"
                         title="Provincial Elections" :data="provincialFilteredData" :labels="provincialLabelsFilteredData"></column-chart>
                 </div>
             </div>
@@ -85,7 +91,9 @@ export default {
             ages: [],
             races: [],
             nationalFilteredData:[],
+            nationalFilteredColors:[],
             provincialFilteredData:[],
+            provincialFilteredColors:[],
             nationalLabelsFilteredData:[],
             provincialLabelsFilteredData:[],
             municipalities: [],
@@ -128,7 +136,9 @@ export default {
                 .then(response => {
 
                     this.nationalFilteredData = response.data.national.data;
+                    this.nationalFilteredColors = response.data.national.colors;
                     this.provincialFilteredData = response.data.provincial.data;
+                    this.provincialFilteredColors = response.data.provincial.colors;
                     this.nationalLabelsFilteredData = response.data.national.labels;
                     this.provincialLabelsFilteredData = response.data.provincial.labels;
                     this.nationalLegend = response.data.nationalLegend;
