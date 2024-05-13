@@ -78,7 +78,7 @@
                 </div>
             </div>
         </div>
-        <img src="{{ asset('images/img.png') }}" alt="Logo" class="position-absolute bottom-0 start-0 m-3" width="100" height="100">
     </section>
+    <img src="{{ asset('images/img.png') }}" alt="Logo" class="bottom-0 start-0 m-3" width="100" height="100">
 
 @endsection
