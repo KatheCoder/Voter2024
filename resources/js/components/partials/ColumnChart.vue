@@ -64,9 +64,13 @@ export default {
                             formatter: function () {
                                 return `${this.y}%`;
                             },
+
                             // rotation: -90,
                         },
-                        colorByPoint: true // Enable color by point
+                        colorByPoint: true ,
+                        tooltip: {
+                            pointFormat: '<span style="color:{point.color}">\u25CF</span> {series.name}: <b>{point.y}%</b><br/>'
+                        }
                     }
                 },
                 series: [{
