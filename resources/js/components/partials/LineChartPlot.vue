@@ -59,11 +59,19 @@ export default {
                     shared: true,
                     useHTML: true,
                     formatter: function() {
-                          let tooltip = `<span style="font-size: 10px">${this.x}</span><br/>`;
+                        let totalSampleCount = 0;
+
+                        // Calculate the total sample count for the current index across all series
                         this.points.forEach((point) => {
-                            const sampleCount = point.series.options.sampleCounts[ point.point.index]; // Get the sample count for the current point
-                            tooltip += `<span style="color:${point.series.color}">${point.series.name}</span>: <b>${point.y}%</b> ( ${sampleCount} )<br/>`;
+                            totalSampleCount += point.series.options.sampleCounts[point.point.index];
                         });
+
+                        let tooltip = `<span style="font-size: 10px">${this.x} ( Sample : ${totalSampleCount} )</span><br/>`;
+                        this.points.forEach((point) => {
+                            const sampleCount = point.series.options.sampleCounts[point.point.index]; // Get the sample count for the current point
+                            tooltip += `<span style="color:${point.series.color}">${point.series.name}</span>: <b>${point.y}%</b> (${sampleCount})<br/>`;
+                        });
+
                         return tooltip;
                     }
                 },
