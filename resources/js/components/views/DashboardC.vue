@@ -47,10 +47,9 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="legend-card">
-                        <h3>National</h3>
                         <div class="legend-items card">
                             <div class="card-body">
-                                <line-chart-plot :chartData="this.nationalChartData" :dates="this.nationalDates"/>
+                                <line-chart-plot title="National" :chartData="this.nationalChartData" :dates="this.nationalDates"/>
                             </div>
 
                         </div>
@@ -58,10 +57,9 @@
                 </div>
                 <div class="col-md-6">
                     <div class="legend-card">
-                        <h3>Provincial</h3>
                         <div class="legend-items card">
                             <div class="card-body">
-                                <line-chart-plot :chartData="this.provincialChartData" :dates="this.provincialDates"/>
+                                <line-chart-plot title="Provincial" :chartData="this.provincialChartData" :dates="this.provincialDates"/>
                             </div>
 
                         </div>

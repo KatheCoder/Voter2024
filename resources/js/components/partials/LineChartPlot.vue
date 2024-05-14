@@ -18,6 +18,10 @@ export default {
             type: Array,
             required: true
         },
+        title: {
+            type: String,
+            required: true
+        },
         dates: {
             type: Array,
             required: true
@@ -34,7 +38,7 @@ export default {
                     enabled: false
                 },
                 title: {
-                    text: ''
+                    text: this.title
                 },
                 xAxis: {
                     categories: this.dates,
