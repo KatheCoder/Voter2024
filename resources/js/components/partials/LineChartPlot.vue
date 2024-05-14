@@ -74,7 +74,7 @@ export default {
                         if (this.yData) {
                             const total = this.yData.reduce((sum, value) => sum + value, 0);
                             const average = total / this.yData.length;
-                            return `${this.name} ${average.toFixed(2)}% ( ${totalSampleCount} )`;
+                            return `${this.name} : ${average.toFixed(2)}% ( ${totalSampleCount} )`;
                         }
                         return `${this.name} (Total Sample: ${totalSampleCount})`;
                     }
