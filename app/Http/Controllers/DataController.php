@@ -6,20 +6,31 @@ use App\Models\Respondent;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DataController extends Controller
 {
 
-const  PARTY_COLORS = [
-'ANC' => '#ffcb03',
-'DA' => '#00bfff',
-'EFF' => '#FF0000',
-'AJ' => '#4cbb17',
-'MK' => '#000000',
-'IFP' => '#4cbb17',
-'ACTION SA' => '#32CD32',
-'ASC' => '#a94c4c',
-];
+    const  PARTY_COLORS = [
+        'ANC' => '#ffcb03',
+        'DA' => '#00bfff',
+        'EFF' => '#FF0000',
+        'AJ' => '#4cbb17',
+        'MK' => '#000000',
+        'IFP' => '#4cbb17',
+        'ACTION SA' => '#32CD32',
+        'ASC' => '#a94c4c',
+    ];
+    const  FULL_PARTY_COLORS = [
+        'AFRICAN NATIONAL CONGRESS' => '#ffcb03',
+        'DEMOCRATIC ALLIANCE' => '#00bfff',
+        'ECONOMIC FREEDOM FIGHTERS' => '#FF0000',
+        'AJ' => '#4cbb17',
+        'UMKHONTO WESIZWE' => '#000000',
+        'INKATHA FREEDOM PARTY' => '#4cbb17',
+        'ACTION SA' => '#32CD32',
+        'ASC' => '#a94c4c',
+    ];
 
 
     public function getPieFilteredData(Request $request): JsonResponse
@@ -111,7 +122,6 @@ const  PARTY_COLORS = [
             $provincialPercentages = $this->calculatePercentages($provincialData);
 
 
-
             $nationalLegend = $nationalData->map(function ($item, $index) use ($nationalPercentages, $nationalData) {
                 $color = self::PARTY_COLORS[$item->abbreviated_national] ?? '#A9A9A9'; // Default to black if color not found
 
@@ -155,7 +165,115 @@ const  PARTY_COLORS = [
         }
     }
 
+    public function lineChartData(Request $request): JsonResponse
+    {
+        try {
+            $parameters = $request->all();
 
+            $filters = [
+                'gender' => $parameters['gender'] ?? null,
+                'age_groups' => $parameters['age_groups'] ?? null,
+                'race' => $parameters['race'] ?? null,
+                'municipality' => $parameters['municipality'] ?? null,
+            ];
+            $type = $request->type;
+            if (!in_array($type, ['national', 'provincial'])) {
+                throw new \InvalidArgumentException('Invalid type specified.');
+            }
+
+            $inputData = $this->applyFilters(Respondent::query(), $filters)->get();
+
+            $processedData = $this->processData($inputData, $type);
+
+            $topParties = $this->getTopParties($type);
+
+            $otherPartyData = $this->calculateOtherPartyData($inputData, $processedData, $topParties, $type);
+
+            $chartData = $this->formatChartData($processedData, $topParties, $otherPartyData, $type);
+
+            return response()->json([
+                'dates' => $processedData->keys(),
+                'results' => $chartData,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
+    private function processData($inputData, string $type)
+    {
+        return $inputData->groupBy('date')
+            ->map(function ($group) use ($type) {
+                $totalCountPerDate = $group->count('id');
+                return $group->groupBy($type)->map(function ($groupByType) use ($totalCountPerDate) {
+                    $totalCountForParty = $groupByType->count('id');
+                    return round($totalCountForParty / $totalCountPerDate * 100, 2); // Calculate percentage to 2 decimal places
+                });
+            });
+    }
+
+    private function getTopParties(string $type)
+    {
+        // Define the top 5 parties based on the type
+        return [
+            'AFRICAN NATIONAL CONGRESS',
+            'DEMOCRATIC ALLIANCE',
+            'ECONOMIC FREEDOM FIGHTERS',
+            'INKATHA FREEDOM PARTY',
+            'UMKHONTO WESIZWE'
+        ];
+    }
+
+    private function calculateOtherPartyData($inputData, $processedData, $topParties, string $type)
+    {
+        $otherPartyData = [];
+        foreach ($processedData as $date => $groupedByDate) {
+            $otherPartiesCount = $inputData
+                ->where('date', $date)
+                ->reject(fn($respondent) => in_array($respondent->$type, $topParties))
+                ->count('id'); // Count the IDs
+
+            // Calculate the percentage for the "Other" party for the current date
+            $totalCountPerDate = $inputData->where('date', $date)->count('id');
+            $otherPartyData[$date] = $totalCountPerDate > 0 ? round($otherPartiesCount / $totalCountPerDate * 100, 2) : 0;
+        }
+        return $otherPartyData;
+    }
+
+    private function formatChartData($processedData, $topParties, $otherPartyData, string $type)
+    {
+        $chartData = [];
+        foreach ($topParties as $party) {
+            $partyData = [];
+            foreach ($processedData->keys() as $date) {
+                $partyData[] = $processedData[$date]->get($party, 0);
+            }
+            $chartData[] = [
+                'name' => $party,
+                'data' => $partyData,
+                'color' => self::FULL_PARTY_COLORS[$party] ?? '#000000',  // Default color if not specified
+            ];
+        }
+
+        // Add the "Other" party data to the chart data
+        $chartData[] = [
+            'name' => 'Other',
+            'data' => array_values($otherPartyData), // Convert associative array to indexed array
+            'color' => '#a94c4c',  // Color for the combined "other" party
+        ];
+
+        return $chartData;
+    }
+
+    private function convertToObjects($array)
+    {
+        $objects = [];
+        foreach ($array as $party => $weight) {
+            $objects[] = ['party' => $party, 'weight' => $weight];
+        }
+        return $objects;
+    }
 
 
     private function applyFilters($query, $filters)

@@ -1,7 +1,8 @@
 import { createWebHistory, createRouter } from "vue-router"
 import Home from "../views/Home"
 import DashboardA from "../views/DashboardA"
-import DashboardB from "../views/DashboardB"
+import SecondView from "../views/SecondView"
+import DashboardC from "../views/DashboardC"
 import NotFound from "../views/PageNotFound"
 
 
@@ -15,9 +16,15 @@ const routes = [
         path: "/dashboard/A",
         component:DashboardA,
         name:"DashboardA",
-    },   {
+    },
+    {
         path: "/dashboard/B",
-        component:DashboardB,
+        component:SecondView,
+        name:"SecondView",
+    },
+    {
+        path: "/dashboard/C",
+        component:DashboardC,
         name:"DashboardB",
     },
     {

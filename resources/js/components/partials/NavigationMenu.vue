@@ -29,6 +29,11 @@
                             <i class="fas fa-tasks me-1"></i> View 2
                         </router-link>
                     </li>
+                    <li class="nav-item ">
+                        <router-link class="nav-link " to="/dashboard/C">
+                            <i class="fas fa-tasks me-1"></i> View 3
+                        </router-link>
+                    </li>
                     <li class="nav-item">
                         <router-link class="nav-link" @click="logout" to="/logout">
                             <i class="fas fa-sign-out-alt me-1"></i> Logout
