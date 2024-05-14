@@ -17,6 +17,7 @@ class RespondentsImport implements ToModel, WithStartRow
 
     public function model(array $row): Respondent
     {
+        $date = $this->correctDateTime($row[11]);
         $this->rowCount++;
         return new Respondent([
             'sbjNum' => $this->cleanData($row[0]),
@@ -30,6 +31,7 @@ class RespondentsImport implements ToModel, WithStartRow
             'national' => $this->cleanData($row[8]),
             'provincial' => $this->cleanData($row[9]),
             'weight' => $this->cleanData($row[10]),
+            'date' => $date['Date'],
         ]);
     }
 
@@ -46,4 +48,22 @@ class RespondentsImport implements ToModel, WithStartRow
     {
         return 2;
     }
+
+    function correctDateTime($dateTime)
+    {
+        # integer digits for Julian date
+        $julDate = floor($dateTime);
+        # The fractional digits for Julian Time
+        $julTime = $dateTime - $julDate;
+        # Converts to Timestamp
+        $timeStamp = ($julDate > 0) ? ($julDate - 25569) * 86400 + $julTime * 86400 : $julTime * 86400;
+
+        # php date function to convert local time
+        return [
+            'Date-Time' => date('Y-m-d H:i:s', $timeStamp),
+            'Date' => date('Y-m-d', $timeStamp),
+            'Time' => date('H:i:s', $timeStamp)
+        ];
+    }
+
 }

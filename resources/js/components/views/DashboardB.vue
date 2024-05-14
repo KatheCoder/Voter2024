@@ -58,6 +58,7 @@
                        ></column-chart>
                 </div>
             </div>
+            <line-chart></line-chart>
         </div>
 
     </section>
@@ -70,12 +71,13 @@
 import NavigationMenu from "../partials/NavigationMenu";
 import ColumnChart from "../partials/ColumnChart";
 import LegendCard from "../partials/LegendCard";
+import LineChart from "../partials/LineChart";
 
 import axios from "axios";
 
 export default {
      name: "DashboardB",
-    components: {NavigationMenu,ColumnChart,LegendCard},
+    components: {LineChart,NavigationMenu,ColumnChart,LegendCard},
     data() {
         return {
             selectedGender: '',
