@@ -59,24 +59,31 @@ export default {
                     shared: true,
                     useHTML: true,
                     formatter: function() {
-                        let tooltip = `<span style="font-size: 10px">${this.x}</span><br/>`;
-                        this.points.forEach(point => {
-                            tooltip += `<span style="color:${point.series.color}">${point.series.name}</span>: <b>${point.y}%</b><br/>`;
+                          let tooltip = `<span style="font-size: 10px">${this.x}</span><br/>`;
+                        this.points.forEach((point) => {
+                            const sampleCount = point.series.options.sampleCounts[ point.point.index]; // Get the sample count for the current point
+                            tooltip += `<span style="color:${point.series.color}">${point.series.name}</span>: <b>${point.y}%</b> ( ${sampleCount} )<br/>`;
                         });
                         return tooltip;
                     }
                 },
                 legend: {
                     labelFormatter: function() {
-                        const total = this.yData.reduce((sum, value) => sum + value, 0);
-                        const average = total / this.yData.length;
-                        return `${this.name} (${average.toFixed(2)}%)`;
+                        const series = this.chart.series.find(s => s.name === this.name);
+                        const totalSampleCount = series.userOptions.sampleCounts.reduce((total, count) => total + count, 0);
+                        if (this.yData) {
+                            const total = this.yData.reduce((sum, value) => sum + value, 0);
+                            const average = total / this.yData.length;
+                            return `${this.name} ${average.toFixed(2)}% ( ${totalSampleCount} )`;
+                        }
+                        return `${this.name} (Total Sample: ${totalSampleCount})`;
                     }
                 },
-                series: this.chartData.map(data => ({
+                series: this.chartData.map((data,index) => ({
                     name: data.name,
                     data: data.data,
-                    color: data.color
+                    color: data.color,
+                    sampleCounts: data.sampleCounts || [], // Ensure sampleCounts is defined
                 }))
             }
         };
@@ -106,10 +113,11 @@ export default {
     methods: {
         updateChart() {
             if (this.$refs.chart && this.$refs.chart.chart) {
-                this.chartOptions.series = this.chartData.map(data => ({
+                this.chartOptions.series = this.chartData.map((data,index) => ({
                     name: data.name,
                     data: data.data,
-                    color: data.color
+                    color: data.color,
+                    sampleCounts: data.sampleCounts || [], // Ensure sampleCounts is defined
                 }));
                 this.chartOptions.xAxis.categories = this.dates;
 

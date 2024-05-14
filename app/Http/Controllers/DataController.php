@@ -84,7 +84,7 @@ class DataController extends Controller
         }
     }
 
-    public function getOverallCount()
+    public function getOverallCount(): JsonResponse
     {
         return response()->json([
             'overall' => Respondent::count(),
@@ -189,8 +189,7 @@ class DataController extends Controller
 
             $otherPartyData = $this->calculateOtherPartyData($inputData, $processedData, $topParties, $type);
 
-            $chartData = $this->formatChartData($processedData, $topParties, $otherPartyData, $type);
-
+            $chartData = $this->formatChartData($processedData, $topParties, $otherPartyData, $type, $inputData);
             return response()->json([
                 'dates' => $processedData->keys(),
                 'results' => $chartData,
@@ -199,7 +198,6 @@ class DataController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
 
     private function processData($inputData, string $type)
     {
@@ -213,7 +211,7 @@ class DataController extends Controller
             });
     }
 
-    private function getTopParties(string $type)
+    private function getTopParties(string $type): array
     {
         // Define the top 5 parties based on the type
         return [
@@ -225,7 +223,7 @@ class DataController extends Controller
         ];
     }
 
-    private function calculateOtherPartyData($inputData, $processedData, $topParties, string $type)
+    private function calculateOtherPartyData($inputData, $processedData, $topParties, string $type): array
     {
         $otherPartyData = [];
         foreach ($processedData as $date => $groupedByDate) {
@@ -241,32 +239,56 @@ class DataController extends Controller
         return $otherPartyData;
     }
 
-    private function formatChartData($processedData, $topParties, $otherPartyData, string $type)
+    private function formatChartData($processedData, $topParties, $otherPartyData, string $type, $inputData): array
     {
         $chartData = [];
+
+        // Calculate sample counts for each party
         foreach ($topParties as $party) {
             $partyData = [];
+            $sampleCounts = [];
+
             foreach ($processedData->keys() as $date) {
                 $partyData[] = $processedData[$date]->get($party, 0);
+                $sampleCounts[] = $inputData
+                    ->where('date', $date)
+                    ->where($type, $party)
+                    ->count();
             }
+
+            // Add party data to chart data
             $chartData[] = [
                 'name' => $party,
                 'data' => $partyData,
+                'sampleCounts' => $sampleCounts,
                 'color' => self::FULL_PARTY_COLORS[$party] ?? '#000000',  // Default color if not specified
             ];
         }
 
-        // Add the "Other" party data to the chart data
+        // Calculate sample counts for the "Other" party
+        $otherSampleCounts = [];
+
+        foreach ($processedData->keys() as $date) {
+            $otherSampleCounts[] = $inputData
+                ->where('date', $date)
+                ->reject(function ($respondent) use ($topParties, $type) {
+                    return in_array($respondent->$type, $topParties);
+                })
+                ->count();
+        }
+
+        // Add "Other" party data to chart data
         $chartData[] = [
             'name' => 'Other',
             'data' => array_values($otherPartyData), // Convert associative array to indexed array
+            'sampleCounts' => $otherSampleCounts,
             'color' => '#a94c4c',  // Color for the combined "other" party
         ];
 
         return $chartData;
     }
 
-    private function convertToObjects($array)
+    private function convertToObjects($array): array
     {
         $objects = [];
         foreach ($array as $party => $weight) {
