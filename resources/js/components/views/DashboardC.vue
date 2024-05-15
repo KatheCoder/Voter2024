@@ -66,6 +66,12 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-6"><legend-card title="National" :legend-data="this.national"></legend-card></div>
+                <div class="col-md-6"><legend-card title="Provincial" :legend-data="this.provincial"></legend-card></div>
+            </div>
+
+
         </div>
     </section>
 
@@ -74,12 +80,13 @@
 <script>
 import NavigationMenu from "../partials/NavigationMenu";
 import LineChartPlot from "../partials/LineChartPlot";
+import LegendCard from "../partials/LegendCard";
 
 import axios from "axios";
 
 export default {
     name: "DashboardC",
-    components: {LineChartPlot, NavigationMenu},
+    components: {LegendCard,LineChartPlot, NavigationMenu},
     data() {
         return {
             filters: {
@@ -144,7 +151,8 @@ export default {
         fetchData() {
             this.fetchNationalChartData();
             this.fetchProvincialChartData();
-        },
+            this.fetchTableData();
+         },
         fetchNationalChartData() {
             axios
                 .get('/api/line', {
@@ -182,7 +190,28 @@ export default {
                 .catch((error) => {
                     console.error(error);
                 });
-        }
+        },
+
+        fetchTableData() {
+            axios.get('/api/data', {
+                params: {
+                    gender: this.selectedGender,
+                    age_groups: this.selectedAge,
+                    race: this.selectedRace,
+                    municipality: this.selectedMunicipality
+                }
+            })
+                .then(response => {
+
+                    this.national = response.data.national;
+                    this.provincial = response.data.provincial;
+
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+
+        },
     },
     mounted() {
         this.fetchFilters();

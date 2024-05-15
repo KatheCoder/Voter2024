@@ -203,9 +203,9 @@ class DataController extends Controller
     {
         return $inputData->groupBy('date')
             ->map(function ($group) use ($type) {
-                $totalCountPerDate = $group->count('id');
+                $totalCountPerDate = $group->sum('weight');
                 return $group->groupBy($type)->map(function ($groupByType) use ($totalCountPerDate) {
-                    $totalCountForParty = $groupByType->count('id');
+                    $totalCountForParty = $groupByType->sum('weight');
                     return round($totalCountForParty / $totalCountPerDate * 100, 2); // Calculate percentage to 2 decimal places
                 });
             });
@@ -230,10 +230,10 @@ class DataController extends Controller
             $otherPartiesCount = $inputData
                 ->where('date', $date)
                 ->reject(fn($respondent) => in_array($respondent->$type, $topParties))
-                ->count('id'); // Count the IDs
+                ->sum('weight'); // Count the IDs
 
             // Calculate the percentage for the "Other" party for the current date
-            $totalCountPerDate = $inputData->where('date', $date)->count('id');
+            $totalCountPerDate = $inputData->where('date', $date)->sum('weight');
             $otherPartyData[$date] = $totalCountPerDate > 0 ? round($otherPartiesCount / $totalCountPerDate * 100, 2) : 0;
         }
         return $otherPartyData;

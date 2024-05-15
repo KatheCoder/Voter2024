@@ -17,13 +17,13 @@ const routes = [
         component:DashboardA,
         name:"DashboardA",
     },
+    // {
+    //     path: "/dashboard/B",
+    //     component:SecondView,
+    //     name:"SecondView",
+    // },
     {
         path: "/dashboard/B",
-        component:SecondView,
-        name:"SecondView",
-    },
-    {
-        path: "/dashboard/C",
         component:DashboardC,
         name:"DashboardB",
     },
