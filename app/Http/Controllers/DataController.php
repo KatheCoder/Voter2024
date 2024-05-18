@@ -203,9 +203,9 @@ class DataController extends Controller
     {
         return $inputData->groupBy('date')
             ->map(function ($group) use ($type) {
-                $totalCountPerDate = $group->sum('weight');
+                $totalCountPerDate = $group->count(); // Counting IDs instead of summing weights
                 return $group->groupBy($type)->map(function ($groupByType) use ($totalCountPerDate) {
-                    $totalCountForParty = $groupByType->sum('weight');
+                    $totalCountForParty = $groupByType->count(); // Counting IDs instead of summing weights
                     return round($totalCountForParty / $totalCountPerDate * 100, 2); // Calculate percentage to 2 decimal places
                 });
             });
@@ -230,10 +230,10 @@ class DataController extends Controller
             $otherPartiesCount = $inputData
                 ->where('date', $date)
                 ->reject(fn($respondent) => in_array($respondent->$type, $topParties))
-                ->sum('weight'); // Count the IDs
+                ->count('id'); // Count the IDs
 
             // Calculate the percentage for the "Other" party for the current date
-            $totalCountPerDate = $inputData->where('date', $date)->sum('weight');
+            $totalCountPerDate = $inputData->where('date', $date)->count('id');
             $otherPartyData[$date] = $totalCountPerDate > 0 ? round($otherPartiesCount / $totalCountPerDate * 100, 2) : 0;
         }
         return $otherPartyData;
@@ -317,6 +317,13 @@ class DataController extends Controller
     }
 
     private function calculatePercentages($data)
+    {
+        $totalSum = $data->sum('total_weight');
+        return $data->map(function ($item) use ($totalSum) {
+            return round(($item->total_weight / $totalSum) * 100, 1);
+        });
+    }
+    private function calculateUnweightedPercentages($data)
     {
         $totalSum = $data->sum('total_weight');
         return $data->map(function ($item) use ($totalSum) {
