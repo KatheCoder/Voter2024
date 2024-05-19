@@ -92,7 +92,6 @@ class DataController extends Controller
 
     }
 
-
     public function getFilteredData(Request $request): JsonResponse
     {
         try {
@@ -185,7 +184,7 @@ class DataController extends Controller
 
             $processedData = $this->processData($inputData, $type);
 
-            $topParties = $this->getTopParties($type);
+            $topParties = $this->getTopParties();
 
             $otherPartyData = $this->calculateOtherPartyData($inputData, $processedData, $topParties, $type);
 
@@ -199,6 +198,127 @@ class DataController extends Controller
         }
     }
 
+    public function meanDataTable(Request $request): JsonResponse
+    {
+        $parameters = $request->all();
+
+        $filters = [
+            'gender' => $parameters['gender'] ?? null,
+            'age_groups' => $parameters['age_groups'] ?? null,
+            'race' => $parameters['race'] ?? null,
+            'municipality' => $parameters['municipality'] ?? null,
+        ];
+
+        // Define the categories to be averaged
+        $categories = [
+            'lost_faith',
+            'empty_promises',
+            'changes',
+            'unaddressed_by_government',
+            'always_wins',
+            'good_enough',
+            'queues',
+            'too_busy',
+        ];
+
+        $meanRatings = $this->calculateMeanRatings($filters, $categories);
+
+        return response()->json(['meanRatings' => $meanRatings]);
+    }
+
+    public function meanData(Request $request)
+    {
+        $parameters = $request->all();
+
+        $filters = [
+            'gender' => $parameters['gender'] ?? null,
+            'age_groups' => $parameters['age_groups'] ?? null,
+            'race' => $parameters['race'] ?? null,
+            'municipality' => $parameters['municipality'] ?? null,
+        ];
+
+        // Define the categories to be averaged
+        $categories = [
+            'economy',
+            'infrastructure',
+            'transportation',
+            'safety',
+            'combating_corruption',
+            'service_delivery',
+            'historical_success',
+            'brand_values',
+            'personal_liking',
+        ];
+
+        $meanRatings = $this->calculateMeanRatings($filters, $categories);
+
+        return response()->json(['meanRatings' => $meanRatings]);
+    }
+
+    private function calculateMeanRatings(array $filters, array $categories): array
+    {
+        $topParties = $this->getTopParties();
+
+        $inputData = $this->applyFilters(Respondent::select('national')->distinct(), $filters)->get();
+
+        $meanRatings = [];
+        $othersRatings = [];
+
+        foreach ($categories as $category) {
+            foreach ($inputData as $respondent) {
+                $party = $respondent->national;
+                $abbreviatedParty = $respondent->abbreviated_national;
+
+                if (!empty($party)) {
+                    $meanQuery = Respondent::where('national', $party);
+                    $meanQuery = $this->applyFilters($meanQuery, $filters);
+                    $meanRating = $meanQuery->selectRaw("AVG($category) as mean_rating")->pluck('mean_rating')->first();
+
+                    if ($meanRating !== null) {
+                        if (in_array($party, $topParties)) {
+                            $meanRatings[$abbreviatedParty][$category] = round($meanRating, 2);
+                        } else {
+                            $othersRatings[$category][] = $meanRating;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!empty($othersRatings)) {
+            $combinedOthersRatings = [];
+            foreach ($categories as $category) {
+                $combinedOthersRatings[$category] = isset($othersRatings[$category])
+                    ? round(array_sum($othersRatings[$category]) / count($othersRatings[$category]), 2)
+                    : null;
+            }
+            $meanRatings['Others'] = $combinedOthersRatings;
+        }
+
+        return $meanRatings;
+    }
+
+    private function getTopParties(): array
+    {
+        return [
+            'AFRICAN NATIONAL CONGRESS',
+            'DEMOCRATIC ALLIANCE',
+            'ECONOMIC FREEDOM FIGHTERS',
+            'INKATHA FREEDOM PARTY',
+            'UMKHONTO WESIZWE'
+        ];
+    }
+
+    private function applyFilters($query, array $filters)
+    {
+        foreach ($filters as $column => $value) {
+            if (!empty($value)) {
+                $query->where($column, $value);
+            }
+        }
+        return $query;
+    }
+
     private function processData($inputData, string $type)
     {
         return $inputData->groupBy('date')
@@ -209,18 +329,6 @@ class DataController extends Controller
                     return round($totalCountForParty / $totalCountPerDate * 100, 2); // Calculate percentage to 2 decimal places
                 });
             });
-    }
-
-    private function getTopParties(string $type): array
-    {
-        // Define the top 5 parties based on the type
-        return [
-            'AFRICAN NATIONAL CONGRESS',
-            'DEMOCRATIC ALLIANCE',
-            'ECONOMIC FREEDOM FIGHTERS',
-            'INKATHA FREEDOM PARTY',
-            'UMKHONTO WESIZWE'
-        ];
     }
 
     private function calculateOtherPartyData($inputData, $processedData, $topParties, string $type): array
@@ -297,17 +405,6 @@ class DataController extends Controller
         return $objects;
     }
 
-
-    private function applyFilters($query, $filters)
-    {
-        foreach ($filters as $key => $value) {
-            if ($value !== null) {
-                $query->where($key, $value);
-            }
-        }
-        return $query;
-    }
-
     private function getDataForLevel($query, $level)
     {
         return $query
@@ -317,13 +414,6 @@ class DataController extends Controller
     }
 
     private function calculatePercentages($data)
-    {
-        $totalSum = $data->sum('total_weight');
-        return $data->map(function ($item) use ($totalSum) {
-            return round(($item->total_weight / $totalSum) * 100, 1);
-        });
-    }
-    private function calculateUnweightedPercentages($data)
     {
         $totalSum = $data->sum('total_weight');
         return $data->map(function ($item) use ($totalSum) {
