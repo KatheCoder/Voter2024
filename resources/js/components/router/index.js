@@ -3,6 +3,7 @@ import Home from "../views/Home"
 import DashboardA from "../views/DashboardA"
 import SecondView from "../views/SecondView"
 import DashboardC from "../views/DashboardC"
+import DashboardD from "../views/DashboardD"
 import NotFound from "../views/PageNotFound"
 
 
@@ -17,11 +18,11 @@ const routes = [
         component:DashboardA,
         name:"DashboardA",
     },
-    // {
-    //     path: "/dashboard/B",
-    //     component:SecondView,
-    //     name:"SecondView",
-    // },
+    {
+        path: "/dashboard/D",
+        component:DashboardD,
+        name:"ThirdView",
+    },
     {
         path: "/dashboard/B",
         component:DashboardC,

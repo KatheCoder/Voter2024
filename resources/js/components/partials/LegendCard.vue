@@ -62,20 +62,7 @@ export default {
     flex-wrap: wrap;
 }
 
-.legend-item {
-    display: flex;
-    align-items: center;
-    margin-right: 20px;
-}
 
-/*.legend-color {*/
-/*    width: 10px;*/
-/*    height: 10px;*/
-/*    margin-right: 5px;*/
-/*    border-radius: 50%;*/
-/*}*/
 
-.legend-label {
-    font-size: 14px;
-}
+
 </style>
