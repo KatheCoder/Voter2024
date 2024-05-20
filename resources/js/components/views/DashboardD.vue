@@ -41,13 +41,13 @@
             </div>
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-md-6" v-if="!loading">
+                    <div class="col-md-12" v-if="!loading">
                         <datatable heading="Factors influencing your voting choice? (On a scale of 1 to 10, where 1 means least important and 10 means most important)."
                                    :categoryStatements="factorsCategoryStatements"
                                    :meanRatings="filteredData" ></datatable>
 
                     </div>
-                    <div class="col-md-6"   v-if="!secondLoading">
+                    <div class="col-md-12"   v-if="!secondLoading">
 
                             <datatable heading="Reasons for not voting or being unsure about voting ? (On a scale of 1 to 10, where 1 means a Weak Reason and 10 means a Strong Reason)."
                                        :categoryStatements="likelyCategoryStatements"

@@ -1,41 +1,24 @@
 <template>
-    <div class="legend-card">
-        <h5>{{ heading }}</h5>
-        <div class="table-responsive card">
-            <div class="legend-items">
-                <div class="card-body">
-                    <div v-if="Object.keys(meanRatings).length">
-                        <table class="legend-table table table-hover">
-                            <thead>
-                            <tr>
-                                <th>Category</th>
-                                <th v-for="(party, index) in parties" :key="index">{{ party }}</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="(category, categoryName) in categoryStatements" :key="categoryName">
-                                <td>{{ category }}</td>
-                                <td v-for="(party, index) in parties" :key="index">{{
-                                        meanRatings[party][categoryName]
-                                    }}
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div v-else>
-                        <h5>No data to display.</h5>
-                    </div>
-                </div>
+    <div class="card">
+        <div class="card-body">
+            <div v-if="Object.keys(meanRatings).length">
+                <highcharts :options="chartOptions" ref="chart"></highcharts>
+            </div>
+            <div v-else>
+                <h5>No data to display.</h5>
             </div>
         </div>
-
     </div>
 </template>
 
 <script>
+import { Chart } from 'highcharts-vue';
+
 export default {
     name: 'Datatable',
+    components: {
+        highcharts: Chart
+    },
     props: {
         meanRatings: {
             type: Object,
@@ -52,29 +35,93 @@ export default {
     },
     data() {
         return {
-            parties: []
+            chartOptions: {
+                chart: {
+                    type: 'column',
+                    height: 400
+                },
+                title: {
+                    text: this.heading
+                },
+                xAxis: {
+                    categories: Object.values(this.categoryStatements),
+                    title: {
+                        text: 'Categories'
+                    }
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Mean Ratings'
+                    },
+                    labels: {
+                        format: '{value}'
+                    }
+                },
+                plotOptions: {
+                    column: {
+                        dataLabels: {
+                            enabled: true,
+                            style: {
+                                fontSize: '10px' // Adjust font size here
+                            },
+                            formatter: function() {
+                                return this.y; // Display the value on top of the bar
+                            }
+                        }
+                    }
+                },
+                tooltip: {
+                    shared: true,
+                    useHTML: true,
+                    formatter: function() {
+                        let tooltip = `<span style="font-size: 10px">${this.x}</span><br/>`;
+                        this.points.forEach(point => {
+                            tooltip += `<span style="color:${point.color}">${point.series.name}</span>: <b>${point.y}</b><br/>`; // Include the value in parentheses
+                        });
+                        return tooltip;
+                    }
+                },
+                series: []
+            }
         };
     },
-    computed: {
-        categories() {
-            return Object.keys(this.meanRatings[Object.keys(this.meanRatings)[0]]).filter(
-                key => key !== 'average'
-            );
+    watch: {
+        meanRatings: {
+            handler() {
+                this.updateChart();
+            },
+            deep: true
+        },
+        categoryStatements: {
+            handler() {
+                this.updateChart();
+            },
+            deep: true
         }
     },
-    created() {
-        this.parties = Object.keys(this.meanRatings);
+    methods: {
+        updateChart() {
+            if (this.$refs.chart && this.$refs.chart.chart) {
+                const seriesData = Object.entries(this.meanRatings).map(([party, data]) => ({
+                    name: party,
+                    data: Object.values(data).slice(0, -1), // Exclude the color from the data
+                    color: data.color || null // Set the color based on the party color if available
+                }));
+
+                this.chartOptions.series = seriesData;
+                this.$refs.chart.chart.update(this.chartOptions);
+            }
+        }
+    },
+    mounted() {
+        this.updateChart(); // Call updateChart once the component is mounted
     }
 };
 </script>
 
 <style scoped>
-.legend-card {
+.card {
     margin-top: 20px;
-}
-
-.legend-items {
-    display: flex;
-    flex-wrap: wrap;
 }
 </style>

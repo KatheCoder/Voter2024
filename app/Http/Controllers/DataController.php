@@ -265,6 +265,9 @@ class DataController extends Controller
         $othersRatings = [];
 
         foreach ($categories as $category) {
+            $categoryTotal = 0; // Initialize total for current category
+            $categoryCount = 0; // Initialize count for current category
+
             foreach ($inputData as $respondent) {
                 $party = $respondent->national;
                 $abbreviatedParty = $respondent->abbreviated_national;
@@ -275,6 +278,10 @@ class DataController extends Controller
                     $meanRating = $meanQuery->selectRaw("AVG($category) as mean_rating")->pluck('mean_rating')->first();
 
                     if ($meanRating !== null) {
+                        // Add rating to category total
+                        $categoryTotal += $meanRating;
+                        $categoryCount++;
+
                         if (in_array($party, $topParties)) {
                             $meanRatings[$abbreviatedParty][$category] = round($meanRating, 2);
                         } else {
@@ -283,7 +290,13 @@ class DataController extends Controller
                     }
                 }
             }
+
+            // Calculate mean rating for current category
+            $meanRatings['Total'][$category] = $categoryCount > 0 ? round($categoryTotal / $categoryCount, 2) : null;
         }
+
+
+
 
         if (!empty($othersRatings)) {
             $combinedOthersRatings = [];
@@ -294,6 +307,21 @@ class DataController extends Controller
             }
             $meanRatings['Others'] = $combinedOthersRatings;
         }
+
+        // Adding party colors to the returned results
+        foreach ($meanRatings as $party => &$ratings) {
+            if ($party === 'Total') {
+                // Assign a color for the "Totals" section
+                $ratings['color'] = '#3366CC'; // You can change this to any color you prefer
+            } elseif (isset(self::PARTY_COLORS[$party])) {
+                // Assign the party color if available
+                $ratings['color'] = self::PARTY_COLORS[$party];
+            } else {
+                // Assign a default color for Others
+                $ratings['color'] = '#808080'; // You can change this to any default color you prefer
+            }
+        }
+
 
         return $meanRatings;
     }
