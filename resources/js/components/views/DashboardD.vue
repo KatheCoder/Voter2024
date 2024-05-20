@@ -137,6 +137,13 @@ export default {
                     console.error('Error fetching filters:', error);
                 });
         },
+        sortData(data) {
+            const sorted = {};
+            Object.keys(data).sort().forEach(key => {
+                sorted[key] = data[key];
+            });
+            return sorted;
+        },
         fetchData() {
             this.loading = true;
             axios.get('/api/means', {
@@ -148,7 +155,8 @@ export default {
                 }
             })
                 .then(response => {
-                    this.filteredData = response.data.meanRatings;
+                    const sortedData = this.sortData(response.data.meanRatings);
+                    this.filteredData = sortedData;
                     this.loading = false;
                 })
                 .catch(error => {
@@ -165,7 +173,8 @@ export default {
                 }
             })
                 .then(response => {
-                    this.secondTable = response.data.meanRatings;
+                    const sortedData = this.sortData(response.data.meanRatings);
+                    this.secondTable = sortedData;
                     this.secondLoading = false;
                 })
                 .catch(error => {

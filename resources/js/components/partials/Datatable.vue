@@ -54,6 +54,7 @@ export default {
                 },
                 yAxis: {
                     min: 0,
+                    max: 10, // Set the maximum value to 10
                     title: {
                         text: 'Mean Ratings'
                     },
@@ -117,6 +118,7 @@ export default {
             }
         }
     },
+
     mounted() {
         this.updateChart(); // Call updateChart once the component is mounted
     }
