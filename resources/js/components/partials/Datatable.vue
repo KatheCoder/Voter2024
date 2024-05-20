@@ -40,6 +40,9 @@ export default {
                     type: 'column',
                     height: 400
                 },
+                credits: {
+                    enabled: false
+                },
                 title: {
                     text: this.heading
                 },
