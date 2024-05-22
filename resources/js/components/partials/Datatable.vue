@@ -2,7 +2,10 @@
     <div class="card">
         <div class="card-body">
             <div v-if="Object.keys(meanRatings).length">
-                <highcharts :options="chartOptions" ref="chart"></highcharts>
+                <div class="chart-container">
+                    <p class="scroll-instruction">Swipe left or right to view the chart.</p>
+                    <highcharts :options="chartOptions" ref="chart"></highcharts>
+                </div>
             </div>
             <div v-else>
                 <h5>No data to display.</h5>
@@ -12,7 +15,7 @@
 </template>
 
 <script>
-import { Chart } from 'highcharts-vue';
+import {Chart} from 'highcharts-vue';
 
 export default {
     name: 'Datatable',
@@ -30,6 +33,10 @@ export default {
         },
         heading: {
             type: String,
+            required: true
+        },
+        chartKey: {
+            type: String, // Adjust the type according to your needs
             required: true
         }
     },
@@ -49,7 +56,7 @@ export default {
                 xAxis: {
                     categories: Object.values(this.categoryStatements),
                     title: {
-                        text: 'Categories'
+                        text: 'Statements'
                     }
                 },
                 yAxis: {
@@ -64,12 +71,17 @@ export default {
                 },
                 plotOptions: {
                     column: {
+                        pointPadding: 0.2, // Adjust the space between columns
+                        groupPadding: 0.1, // Adjust the space between groups of columns
                         dataLabels: {
                             enabled: true,
+                            crop: false,
+                            overflow: 'none',
+                            allowOverlap: true, // Allow data labels to overlap
                             style: {
                                 fontSize: '10px' // Adjust font size here
                             },
-                            formatter: function() {
+                            formatter: function () {
                                 return this.y; // Display the value on top of the bar
                             }
                         }
@@ -78,7 +90,7 @@ export default {
                 tooltip: {
                     shared: true,
                     useHTML: true,
-                    formatter: function() {
+                    formatter: function () {
                         let tooltip = `<span style="font-size: 10px">${this.x}</span><br/>`;
                         this.points.forEach(point => {
                             tooltip += `<span style="color:${point.color}">${point.series.name}</span>: <b>${point.y}</b><br/>`; // Include the value in parentheses
@@ -86,7 +98,12 @@ export default {
                         return tooltip;
                     }
                 },
-                series: []
+                series: [],
+                exporting: {
+                    sourceWidth: 1800, // Set the width of the exported chart
+                    sourceHeight: 600, // Set the height of the exported chart
+                    scale: 1 // Adjust the scale of the exported chart
+                }
             }
         };
     },
@@ -128,5 +145,35 @@ export default {
 <style scoped>
 .card {
     margin-top: 20px;
+}
+
+.chart-container {
+    width: 100%; /* Make the container full width */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    padding-bottom: 20px; /* Optional: add some padding to improve appearance */
+}
+
+.scroll-instruction {
+    display: none;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+@media (max-width: 992px) {
+    .chart-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
+    }
+
+    .chart-container > div {
+        width: 500%; /* Set a larger width to ensure scrolling is needed */
+    }
+
+    .scroll-instruction {
+        display: block;
+    }
 }
 </style>
