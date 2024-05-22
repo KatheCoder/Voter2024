@@ -1,9 +1,9 @@
 <template>
     <div class="card">
+        <p class="scroll-instruction">Swipe left or right to view the chart.</p>
         <div class="card-body">
             <div v-if="Object.keys(meanRatings).length">
                 <div class="chart-container">
-                    <p class="scroll-instruction">Swipe left or right to view the chart.</p>
                     <highcharts :options="chartOptions" ref="chart"></highcharts>
                 </div>
             </div>
