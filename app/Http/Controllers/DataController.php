@@ -278,7 +278,7 @@ class DataController extends Controller
 
                     if ($meanRating !== null) {
                         if (in_array($party, $topParties)) {
-                            $meanRatings[$abbreviatedParty][$category] = round($meanRating, 2);
+                            $meanRatings[$abbreviatedParty][$category] = round($meanRating, 1);
                         } else {
                             $othersRatings[$category][] = $meanRating;
                         }
@@ -292,7 +292,7 @@ class DataController extends Controller
 
         foreach ($categories as $category) {
             if (!empty($othersRatings[$category])) {
-                $combinedOthersRating = round(array_sum($othersRatings[$category]) / count($othersRatings[$category]), 2);
+                $combinedOthersRating = round(array_sum($othersRatings[$category]) / count($othersRatings[$category]), 1);
                 $meanRatings['Others'][$category] = $combinedOthersRating;
             } else {
                 $meanRatings['Others'][$category] = null;
@@ -300,7 +300,7 @@ class DataController extends Controller
         }
 
         foreach ($categories as $category) {
-            $meanRatings['Total'][$category] = $categoryCounts[$category] > 0 ? round($categoryTotals[$category] / $categoryCounts[$category], 2) : null;
+            $meanRatings['Total'][$category] = $categoryCounts[$category] > 0 ? round($categoryTotals[$category] / $categoryCounts[$category], 1) : null;
         }
 
         foreach ($meanRatings as $party => &$ratings) {
